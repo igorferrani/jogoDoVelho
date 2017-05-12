@@ -23,25 +23,22 @@ def verificaPreenchido(m, posicao):
   if m[posicao[0]][posicao[1]] == 'x' or m[posicao[0]][posicao[1]] == 'o':
     flag = False
   return flag
-
-def jogaVelha(m, jogador):
-  m[jogador['jogada'][0]][jogador['jogada'][1]] = jogador['time']
   
-def verificaGanhador(m, jogador):
+def verificaGanhador(m, marcador):
   flag = True
   
   # verifica velha na diagonal
-  if m[0][0] == jogador['time'] and m[1][1] == jogador['time'] and m[2][2] == jogador['time']:
+  if m[0][0] == marcador and m[1][1] == marcador and m[2][2] == marcador:
     flag = False
    
   # verifica velha na diagonal inverssa 
-  if m[2][2] == jogador['time'] and m[1][1] == jogador['time'] and m[0][0] == jogador['time']:
+  if m[2][2] == marcador and m[1][1] == marcador and m[0][0] == marcador:
     flag = False
     
   somaHorizontal = 0
   for i in range(len(m[0])):
     for j in range(len(m)):
-      if m[i][j] == jogador['time'] and flag:
+      if m[i][j] == marcador and flag:
         somaHorizontal += 1
         if somaHorizontal == 3:
           flag = False
@@ -50,7 +47,7 @@ def verificaGanhador(m, jogador):
   somaVertical = 0
   for i in range(len(m[0])):
     for j in range(len(m)):
-      if m[j][i] == jogador['time'] and flag:
+      if m[j][i] == marcador and flag:
         somaVertical += 1
         if somaVertical == 3:
           flag = False
@@ -58,8 +55,8 @@ def verificaGanhador(m, jogador):
 
   return flag
   
-def marcaJogada(m, jogador):
-  m[jogador['jogada'][0]][jogador['jogada'][1]] = jogador['time']
+def marcaJogada(m, posicao, marcador):
+  m[posicao[0]][posicao[1]] = marcador
 
 def verificaPosicoesVazia(m):
   aux = []
@@ -82,6 +79,12 @@ def tabuleiroCompleto(m):
         return False
   return True
 
+# def joinPartida(partida, marcador):
+#   ret = ''
+#   j = ''
+#   for i in range(len(partida)):
+#     ret += marcador
+
 
 # Funcoes inteligentes
 historicoJogadas = []
@@ -95,37 +98,36 @@ historicoJogadas = []
 flag_jogo = True
 
 matriz = cria_matriz_nula(3, 3)
-player = {'jogada':[0, 0], 'time': 'x'}
-pc = {'jogada':[0, 0], 'time': 'o'}
-jogadas1 = []
-jogadas2 = []
 
-ultimo_jogou = 2
+jogada = []
+partida_p1 = []
+partida_p2 = []
 
-montaTabuleiro(matriz)
+marcador = 'X' # jogo comeca com o computador
+
+#montaTabuleiro(matriz)
+
 
 while flag_jogo:  
   # se o ultimo a jogar foi o PC
-  if(ultimo_jogou != 1):
-    player['jogada'][0] = int(input("Informe a linha: "))
-    player['jogada'][1] = int(input("Informe a coluna: "))
+  if(marcador != 'X'):
+    marcador = 'X'
+    respostaPosicao = [int(input("Informe a linha: ")), int(input("Informe a coluna: "))]
+    jogada = respostaPosicao
 
-    jogador = player
-
-    if(verificaPreenchido(matriz, player['jogada'])):
-      marcaJogada(matriz, player)
-      ultimo_jogou = 1
-      jogadas1.append(player['jogada'])
-      jogadas = jogadas1
+    if(verificaPreenchido(matriz, jogada)):
+      marcaJogada(matriz, jogada, marcador)
+      partida_p1.append(jogada)
   else:
-    pc['jogada'] = jogadaAutomatica(matriz)
-    marcaJogada(matriz, pc)
-    jogador = pc
-    ultimo_jogou = 2
-    jogadas2.append(pc['jogada'])
-    jogadas = jogadas2
+    marcador = 'O'
+    jogada = jogadaAutomatica(matriz)
+    marcaJogada(matriz, jogada, marcador)
+    partida_p2.append(jogada)
 
-  if(verificaGanhador(matriz, jogador) != True):
+  # zera a jogada
+  jogada = []
+
+  if(verificaGanhador(matriz, marcador) != True):
     print('Ganhooooou !')
     flag_jogo = False
   elif(tabuleiroCompleto(matriz)):
@@ -133,9 +135,12 @@ while flag_jogo:
 
   # se o jogo acabar zera as jogadas
   if(flag_jogo != True):
-    historicoJogadas.append(jogadas)
-    jogadas1 = []
-    jogadas2 = []
+    j = ''
+    print(partida_p1)
+    j.join(partida_p1)
+    historicoJogadas[j] = partida_p1
+    j.join(partida_p2)
+    historicoJogadas[j] = partida_p2
 
   montaTabuleiro(matriz)
   print(historicoJogadas)
