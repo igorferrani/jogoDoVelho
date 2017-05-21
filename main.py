@@ -189,8 +189,4 @@ def init():
 #=================================================  
 
 
-#init()
-
-txt = "01020304"
-
-print convertTxtToArray(txt)
+init()
