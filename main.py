@@ -97,11 +97,25 @@ def writeFileJson(file, data):
   fo = open(file, 'w')
   fo.write(aux)
 
+# Converte as jogadas em array para texto
 def convertArrayToTxt(arr):
   s = ''
   for a in arr:
     s += str(a[0])+str(a[1])
   return s
+
+# Converte as jogadas em texto para array
+def convertTxtToArray(txt):
+  arr = []
+  count = 2
+  c = 0
+  for i in range(len(txt)/2):
+    t = txt[c:count]
+    arr.append([t[0], t[1]])
+    count += 2
+    c += 2
+  return arr
+  
 
 # Salva a partida do jogo
 def saveMatchGame(match, winner):
@@ -175,4 +189,8 @@ def init():
 #=================================================  
 
 
-init()
+#init()
+
+txt = "01020304"
+
+print convertTxtToArray(txt)
