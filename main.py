@@ -1,9 +1,9 @@
 import random
+import json
 
 def cria_matriz_nula(m ,n):
   lista = []
   aux = []
-  
   for i in range(m):
     for j in range(n):
       aux.append('_')
@@ -79,68 +79,100 @@ def tabuleiroCompleto(m):
         return False
   return True
 
-# def joinPartida(partida, marcador):
-#   ret = ''
-#   j = ''
-#   for i in range(len(partida)):
-#     ret += marcador
+# Leitura de arquivos JSON
+def readFileJson(file):
+  fo = open(file, "r")
+  jsonData = fo.read()
+  if jsonData:
+    jsonToPython = json.loads(jsonData)
+    return jsonToPython
+  return []
+
+# Escrita em arquivos JSON
+def writeFileJson(file, data):
+  jsonFile = readFileJson(file)
+  for d in data:
+    jsonFile.append(d)
+  aux = json.dumps(jsonFile)
+  fo = open(file, 'w')
+  fo.write(aux)
+
+def convertArrayToTxt(arr):
+  s = ''
+  for a in arr:
+    s += str(a[0])+str(a[1])
+  return s
+
+# Salva a partida do jogo
+def saveMatchGame(match, winner):
+  if(winner == 'X'):
+    peso = ["100", "010"]
+  elif(winner == 'O'):
+    peso = ["010", "100"]
+  else:
+    peso = ["001", "001"]
+
+  # Jogador X
+  t1 = {
+    "jogada": convertArrayToTxt(match[0]),
+    "peso": peso[0]
+  }
+  # Jogador O
+  t2 = {
+    "jogada": convertArrayToTxt(match[1]),
+    "peso": peso[1]
+  }
+
+  arr = [json.dumps(t1), json.dumps(t2)]
+  j = ','.join(arr)
+  j = '['+j+']'
+  writeFileJson("memo.json", json.loads(j))
 
 
-# Funcoes inteligentes
-historicoJogadas = []
+def init():
+  flag_jogo = True
+  matriz = cria_matriz_nula(3, 3)
+  historicoJogadas = []
+  partida = [[], []]
+  marcador = ''
+  winner = ''
 
-#def salvaPartida(h):
+  while flag_jogo:
+    if(marcador != 'X'):
+      marcador = 'X'
+      jogada = [int(input("Informe a linha: ")), int(input("Informe a coluna: "))]
+      if(verificaPreenchido(matriz, jogada)):
+        marcaJogada(matriz, jogada, marcador)
+        partida[0].append(jogada)
+    else:
+      marcador = 'O'
+      jogada = jogadaAutomatica(matriz)
+      marcaJogada(matriz, jogada, marcador)
+      partida[1].append(jogada)
 
 
-  
+
+
+
+
+
+
+    if(verificaGanhador(matriz, marcador) != True):
+      print('Ganhooooou !')
+      flag_jogo = False
+      winner = marcador
+    elif(tabuleiroCompleto(matriz)):
+      flag_jogo = False
+
+
+
+    montaTabuleiro(matriz)
+
+    # se o jogo acabar zera as jogadas
+    if(flag_jogo != True):
+      print saveMatchGame(partida, winner)
+
 #=================================================  
 
-flag_jogo = True
 
-matriz = cria_matriz_nula(3, 3)
-
-jogada = []
-partida_p1 = []
-partida_p2 = []
-
-marcador = 'X' # jogo comeca com o computador
-
-#montaTabuleiro(matriz)
-
-
-while flag_jogo:  
-  # se o ultimo a jogar foi o PC
-  if(marcador != 'X'):
-    marcador = 'X'
-    respostaPosicao = [int(input("Informe a linha: ")), int(input("Informe a coluna: "))]
-    jogada = respostaPosicao
-
-    if(verificaPreenchido(matriz, jogada)):
-      marcaJogada(matriz, jogada, marcador)
-      partida_p1.append(jogada)
-  else:
-    marcador = 'O'
-    jogada = jogadaAutomatica(matriz)
-    marcaJogada(matriz, jogada, marcador)
-    partida_p2.append(jogada)
-
-  # zera a jogada
-  jogada = []
-
-  if(verificaGanhador(matriz, marcador) != True):
-    print('Ganhooooou !')
-    flag_jogo = False
-  elif(tabuleiroCompleto(matriz)):
-    flag_jogo = False
-
-  # se o jogo acabar zera as jogadas
-  if(flag_jogo != True):
-    j = ''
-    print(partida_p1)
-    j.join(partida_p1)
-    historicoJogadas[j] = partida_p1
-    j.join(partida_p2)
-    historicoJogadas[j] = partida_p2
-
-  montaTabuleiro(matriz)
-  print(historicoJogadas)
+init()
